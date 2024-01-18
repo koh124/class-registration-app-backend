@@ -1,0 +1,89 @@
+Parameters:
+  StageName:
+    Description: stage name
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - stg
+      - prd
+
+  # webページ配信用のバケット名
+  WebPageBucketNameBase:
+    Description: S3 Bucket for streaming web page
+    Type: String
+    Default: "webpage-bucket"
+
+  BucketRootObjectName:
+    Description: root object name for web page bucket
+    Type: String
+    Default: "index.html"
+
+  # ----------- S3 ----------
+Resources:
+  WebPageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${WebPageBucketNameBase}
+      # パブリックアクセスをブロック
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  WebPageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebPageBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # - Sid: AllowCloudFrontServicePrincipal
+          #   Effect: Allow
+          #   Principal:
+          #     Service: cloudfront.amazonaws.com
+          #   Action: "s3:GetObject"
+          #   Resource: !Sub "arn:aws:s3:::${WebPageBucket}/*"
+          #   Condition:
+          #     StringEquals:
+          #       AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+          - Sid: AllowCloudFrontOriginAccessIdentity
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOAI}"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${WebPageBucket}/*"
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: !GetAtt WebPageBucket.DomainName
+            DomainName: !GetAtt WebPageBucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOAI}
+        DefaultCacheBehavior:
+          TargetOriginId: !GetAtt WebPageBucket.DomainName
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        Enabled: true
+        DefaultRootObject: !Sub ${BucketRootObjectName}
+        HttpVersion: http2
+        Comment: "CloudFront with webpage-bucket Origin"
+
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "OAI used for webpage-bucket access"
+
+Outputs:
+  WebPageBucket:
+    Value: !Ref WebPageBucket
+  CloudFrontDistributionDomain:
+    Value: !Ref CloudFrontDistribution
