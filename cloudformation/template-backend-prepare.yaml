@@ -1,0 +1,19 @@
+Parameters:
+  StageName:
+    Description: stage name
+    Type: String
+    Default: STG
+    AllowedValues:
+      - STG
+      - PRD
+
+Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: nest-app
+
+Outputs:
+  ECRRepositoryName:
+    Description: ECR repo name
+    Value: !Ref ECRRepository
