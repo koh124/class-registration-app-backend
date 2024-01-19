@@ -25,10 +25,22 @@ jobs:
       - name: echo
         run: echo "Helloworld"
 
-      #   - name: Set up Docker
-      #     uses: docker/setup-docker-action@v2
-      #     with:
-      #       version: latest
-
       - name: check for docker command is available
         run: docker --version
+
+      # awsのクレデンシャルを解決
+      - name: configure aws credencials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: deploy ecr
+        run: aws cloudformation deploy --template-file cloudformation/template-backend-prepare.yaml --stack-name ecr
+
+      - name: build app
+        run: docker build . -t nest-app
+
+      - name: login to ecr
+        run: aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com
