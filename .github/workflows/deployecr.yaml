@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-ecr:
-    name: deploy frontend
+    name: deploy ECR and App Image
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,3 +24,11 @@ jobs:
 
       - name: echo
         run: echo "Helloworld"
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v2
+        with:
+          version: latest
+
+      - name: check for docker command is available
+        run: docker --version
