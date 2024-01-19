@@ -59,8 +59,16 @@ Resources:
             Principal:
               AWS: !Sub "arn:aws:iam::${AWS::AccountId}:user/admin"
             Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+            Resource: !Sub "arn:aws:s3:::${WebPageBucket}/*"
+          - Sid: AllowListBucketAPI
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:user/admin"
+            Action:
+              - "s3:GetBucketLocation"
               - "s3:ListBucket"
-              # - "s3:PubObject"
             Resource: !Sub "arn:aws:s3:::${WebPageBucket}"
 
   CloudFrontDistribution:
