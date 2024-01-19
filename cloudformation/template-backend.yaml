@@ -12,11 +12,11 @@ Parameters:
     Type: String
     Default: nest-app
 
-  ECRImageUrl:
-    Description: Image url of ECR
-    Type: String
-    # ECRから
-    Default: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}:latest
+  # ECRImageUrl:
+  #   Description: Image url of ECR
+  #   Type: String
+  #   # ECRから
+  #   Default: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}:latest
 
   FargateContainerPort:
     Description: container port number of Fargate task
@@ -331,7 +331,7 @@ Resources:
       ContainerDefinitions:
         - Name: nest-app-server
           # Image: !Ref ECRRepository
-          Image: !Ref ECRImageUrl
+          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}:latest
           PortMappings:
             - ContainerPort: !Ref FargateContainerPort
           Essential: true

@@ -10,5 +10,5 @@ RUN npm install
 
 RUN npm install -g @nestjs/cli
 
-# CMD npm run prisma && npm start
-CMD npm start
+CMD npm run prisma && npm start
+# CMD npm start
