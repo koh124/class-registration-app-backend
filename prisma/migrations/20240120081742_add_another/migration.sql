@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE `UserCourseStateMaster` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `state` ENUM('ENROLLED', 'NOT_ENROLLED', 'COMPLETED', 'NOT_COMPLETED') NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

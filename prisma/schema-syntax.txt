@@ -11,10 +11,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 原則モデルはキャメルケース
 model University {
   id Int @id @default(autoincrement())
   name String
-  courses Courses[]
+  courses Courses[] // Prisma独自のシンタックスでhas manyのリレーションを表現する
 }
 
 model User {
@@ -31,6 +32,9 @@ model Courses {
   period String
   date String
   universityId Int
+
+  // belongs toの外部キー参照はPrisma独自のシンタックスで行う
+  任意のリレーションの命名 関係モデル名 @relation(fields: [参照元のモデルのキー], references: [参照先の主キー])
   university University @relation(fields: [universityId], references: [id])
 }
 
@@ -53,5 +57,6 @@ model UserCourseState {
   stateId Int
   state UserCourseStateMaster @relation(fields: [stateId], references: [id])
 
+  // 複合キーの記述は下記のように行う
   @@id([userId, courseId])
 }

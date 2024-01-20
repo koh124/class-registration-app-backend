@@ -319,8 +319,8 @@ Resources:
     Type: "AWS::ECS::TaskDefinition"
     Properties:
       Family: "ecs-family"
-      Cpu: "256"
-      Memory: "512"
+      Cpu: "1024"
+      Memory: "4096"
       NetworkMode: "awsvpc"
       RequiresCompatibilities:
         - "FARGATE"
@@ -339,6 +339,13 @@ Resources:
             # STG, PRD, どちらの場合でもコンテナのデータベースエンドポイントはRDSを指定する
             - Name: DATABASE_URL
               Value: !Sub mysql://admin:password@${RDSInstance}:3306/class_registration_app?schema=public
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/nest-app-server
+              awslogs-region: ${AWS::Region}
+              awslogs-stream-prefix: my-container
+
 
   # ECSサービスを作成する
   Service:
