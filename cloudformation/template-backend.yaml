@@ -150,11 +150,11 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-        # - IpProtocol: tcp
-        #   FromPort: 3306
-        #   ToPort: 3306
-        #   SourceSecurityGroupId: !Ref SecurityGroupForRDS
-        #   # CidrIp: xxx.xxx.xxx.xxx/32  # 信頼できるIPアドレス範囲
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          # SourceSecurityGroupId: !Ref SecurityGroupForRDS
+          CidrIp: 0.0.0.0/0
 
   SecurityGroupForRDS:
     Type: AWS::EC2::SecurityGroup
@@ -338,7 +338,7 @@ Resources:
           Environment:
             # STG, PRD, どちらの場合でもコンテナのデータベースエンドポイントはRDSを指定する
             - Name: DATABASE_URL
-              Value: !GetAtt [RDSInstance, Endpoint.Address]
+              Value: !Sub mysql://admin:password@${RDSInstance}:3306/class_registration_app?schema=public
 
   # ECSサービスを作成する
   Service:
